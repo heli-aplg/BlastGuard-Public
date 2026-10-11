@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor U as User
+    participant B as BlastGuard
+    participant SSH as ssh tunnel
+    participant RO as readonly DB
+    participant BC as becareful DB
+    U->>B: ./bin/blastguard [-config f]
+    B->>B: load + validate config
+    B->>U: choose language (Enter = English)
+    B->>B: TCP dial each connection's host:port (shared port checked once)
+    alt a port is closed, tunnel.command is set and tunnel.auto_start (default true)
+        B->>SSH: start child: ssh -L 6432:127.0.0.1:5432 apollogix_dev -N
+        B->>B: poll port up to tunnel.wait (ssh output shown only on failure)
+    else tunnel.auto_start: false
+        B-->>U: log status only (port closed, tunnel not started)
+    end
+    B->>RO: connect, verify read-only
+    alt readonly fails
+        B-->>U: error, exit 1
+    end
+    B->>BC: connect (optional)
+    alt becareful fails
+        B-->>U: ALERT, continue readonly-only
+    end
+    B->>B: load cache, or scan schemas/tables via RO
+    B->>U: open TUI (default_schema preselected)

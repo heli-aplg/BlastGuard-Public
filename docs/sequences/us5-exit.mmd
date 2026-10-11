@@ -1,0 +1,10 @@
+sequenceDiagram
+    actor U as User
+    participant T as TUI
+    participant B as BlastGuard
+    participant SSH as ssh tunnel
+    U->>T: /exit, /quit or Ctrl+C
+    T->>B: leave alt-screen
+    B->>U: print last report to stdout (stays in scrollback)
+    B->>B: close DB connections
+    B->>SSH: stop the tunnel (only if BlastGuard started it)

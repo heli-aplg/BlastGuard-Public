@@ -1,0 +1,29 @@
+# Copy to blastguard.yaml in the source root (parent of bin/) or the working directory
+language: en
+default_schema: feight_forwarder
+cache_dir: "" # caching table name to reduce schema fetching, relative = from this file
+max_rows: 10000 # stop (DEAD END) when one delete would touch more rows than this
+timeouts:
+  connect: 5s
+  statement: 15s
+  lock: 3s
+tunnel: # optional; shared by both connections, stopped when BlastGuard exits
+  command: "ssh -L 6432:127.0.0.1:5432 apollogix_dev -N"
+  wait: 30s # how long to wait for the local port to open
+connections:
+  readonly:
+    host: 127.0.0.1
+    port: 6432
+    database: app
+    user: postgres
+    password: "change-me"
+    sslmode: prefer
+  becareful: # optional; every session is still read-only
+    host: 127.0.0.1
+    port: 6432
+    database: app
+    user: postgres
+    password: "change-me"
+    sslmode: prefer
+ai:
+  enabled: false # TODO: AI trigger analyzer (docs/SPEC.md §8)

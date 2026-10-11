@@ -1,0 +1,10 @@
+sequenceDiagram
+    actor U as User
+    participant T as TUI
+    participant RO as readonly
+    participant F as Cache file
+    U->>T: /refresh
+    T->>RO: scan schemas + tables
+    RO-->>T: names, PKs, estimates
+    T->>F: write JSON
+    T->>U: updated lists

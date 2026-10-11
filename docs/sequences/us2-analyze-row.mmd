@@ -1,0 +1,22 @@
+sequenceDiagram
+    actor U as User
+    participant T as TUI
+    participant A as Analyzer
+    participant RO as readonly
+    participant BC as becareful
+    U->>T: pick schema → table, type Row ID, Enter
+    T->>A: analyze(table, id)
+    A->>RO: BEGIN REPEATABLE READ READ ONLY + export snapshot
+    loop root row, then each FK level (BFS)
+        A->>RO: catalog / data query (in SAVEPOINT)
+        alt 42501 / 57014 / 55P03
+            A->>BC: same query on imported snapshot
+            alt also fails
+                A-->>T: DEAD END + both errors
+            end
+        end
+    end
+    A->>RO: ROLLBACK
+    A->>BC: ROLLBACK
+    A-->>T: verdict, tree, triggers, alerts
+    T->>U: REPORT + OPTIONS

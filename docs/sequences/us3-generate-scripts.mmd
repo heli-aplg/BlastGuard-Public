@@ -1,0 +1,12 @@
+sequenceDiagram
+    actor U as User
+    participant T as TUI
+    participant S as Script generator
+    participant C as Clipboard (pbcopy)
+    U->>T: choose option 1
+    T->>S: build from analysis result (no new DB query)
+    S-->>T: delete script + restore script
+    T->>U: show scripts
+    U->>T: /copy delete | /copy restore | /copy
+    T->>C: pbcopy
+    Note over U: User reviews and runs the script elsewhere.<br/>BlastGuard never executes it.
